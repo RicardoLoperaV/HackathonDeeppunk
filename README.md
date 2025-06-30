@@ -6,53 +6,35 @@ Voces de Confianza es un agente de conversación en español diseñado para acom
 
 - **Backend**: FastAPI con Python
 - **Frontend**: React con Web Audio API
-- **IA**: Google Gemini + Google Cloud Speech & Text-to-Speech
+- **IA**: Whisper + Hugging Face Transformers + gTTS
 - **Despliegue**: Docker + Docker Compose
 
 ## 🚀 Instalación y Configuración
 
 ### Prerrequisitos
 
-1. **Cuentas y APIs necesarias**:
-   - [Google Cloud Platform](https://cloud.google.com/) con Speech-to-Text y Text-to-Speech habilitados
-   - [Google AI Studio](https://makersuite.google.com/) para obtener API key de Gemini
-
-2. **Software requerido**:
+1. **Software requerido**:
    - Docker y Docker Compose
    - Node.js 18+ (para desarrollo local)
    - Python 3.11+ (para desarrollo local)
 
-### Configuración de Credenciales
+### Configuración
 
-1. **Google Cloud**:
-   ```bash
-   # Crear service account y descargar JSON key
-   # Guardar como 'service-account-key.json' en el directorio raíz
-   ```
+```bash
+# Copiar archivos de ejemplo (opcional)
+cp frontend/.env.example frontend/.env
 
-2. **Variables de entorno**:
-   ```bash
-   # Copiar archivos de ejemplo
-   cp backend/.env.example backend/.env
-   cp frontend/.env.example frontend/.env
-   
-   # Editar backend/.env
-   GEMINI_API_KEY=tu_api_key_de_gemini
-   GOOGLE_APPLICATION_CREDENTIALS=./service-account-key.json
-   
-   # Editar frontend/.env
-   REACT_APP_API_URL=http://localhost:8000
-   ```
+# Editar frontend/.env si necesitas cambiar la URL del backend
+REACT_APP_API_URL=http://localhost:8000
+```
+
+**Nota**: Los modelos de IA se descargan automáticamente en el primer uso.
 
 ## 🐳 Despliegue con Docker
 
 ### Opción 1: Docker Compose (Recomendado)
 
 ```bash
-# Configurar variables de entorno
-export GEMINI_API_KEY="tu_api_key"
-export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/service-account-key.json"
-
 # Levantar servicios
 docker-compose up --build
 ```
@@ -68,10 +50,7 @@ docker-compose up --build
 # Backend
 cd backend
 docker build -t agente-voz-backend .
-docker run -p 8000:8000 \
-  -e GEMINI_API_KEY="tu_api_key" \
-  -v $(pwd)/../service-account-key.json:/app/credentials.json \
-  agente-voz-backend
+docker run -p 8000:8000 agente-voz-backend
 
 # Frontend
 cd frontend
@@ -180,9 +159,9 @@ npm test
 
 ### Errores comunes
 
-1. **Error de autenticación de Google Cloud**:
-   - Verificar que el archivo JSON de credenciales existe
-   - Confirmar que las APIs están habilitadas en GCP
+1. **Error de descarga de modelos**:
+   - Los modelos se descargan automáticamente en el primer uso
+   - Asegurar conexión a internet estable
 
 2. **Error de CORS en el frontend**:
    - Verificar que el backend esté corriendo en el puerto correcto
@@ -220,8 +199,8 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 ## 🔗 Enlaces Útiles
 
 - [Documentación de FastAPI](https://fastapi.tiangolo.com/)
-- [Google Cloud Speech-to-Text](https://cloud.google.com/speech-to-text)
-- [Google Cloud Text-to-Speech](https://cloud.google.com/text-to-speech)
-- [Google Generative AI](https://ai.google.dev/)
+- [OpenAI Whisper](https://github.com/openai/whisper)
+- [Hugging Face Transformers](https://huggingface.co/transformers/)
+- [gTTS](https://github.com/pndurette/gTTS)
 - [React Documentation](https://reactjs.org/docs/getting-started.html)
 Sistema creado para conversar de manera natural con adultos mayores. Teniendo en cuenta la época que vivieron y las cosas que eran relevantes.

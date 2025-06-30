@@ -2,11 +2,12 @@ from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
-import json
 import base64
+import tempfile
+import whisper
+from transformers import pipeline
+from gtts import gTTS
 from dotenv import load_dotenv
-import google.generativeai as genai
-from google.cloud import speech, texttospeech
 
 load_dotenv()
 
@@ -20,13 +21,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configurar Gemini
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel('gemini-pro')
-
-# Clientes de Google Cloud
-speech_client = speech.SpeechClient()
-tts_client = texttospeech.TextToSpeechClient()
+# Cargar modelos
+whisper_model = whisper.load_model("base")
+chat_pipeline = pipeline("text-generation", model="microsoft/DialoGPT-medium", tokenizer="microsoft/DialoGPT-medium")
 
 class ChatRequest(BaseModel):
     message: str
@@ -42,25 +39,24 @@ async def root():
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
     try:
-        # Generar respuesta con Gemini
-        response = model.generate_content(f"Responde en español de manera conversacional: {request.message}")
-        text_response = response.text
+        # Generar respuesta con Transformers
+        prompt = f"Responde en español de manera conversacional: {request.message}"
+        response = chat_pipeline(prompt, max_length=100, num_return_sequences=1)
+        text_response = response[0]['generated_text'].replace(prompt, "").strip()
         
-        # Convertir texto a audio
-        synthesis_input = texttospeech.SynthesisInput(text=text_response)
-        voice = texttospeech.VoiceSelectionParams(
-            language_code="es-ES",
-            ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL
-        )
-        audio_config = texttospeech.AudioConfig(
-            audio_encoding=texttospeech.AudioEncoding.MP3
-        )
+        if not text_response:
+            text_response = "Lo siento, no pude generar una respuesta adecuada."
         
-        tts_response = tts_client.synthesize_speech(
-            input=synthesis_input, voice=voice, audio_config=audio_config
-        )
+        # Convertir texto a audio con gTTS
+        tts = gTTS(text=text_response, lang='es')
         
-        audio_base64 = base64.b64encode(tts_response.audio_content).decode()
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
+            tts.save(tmp_file.name)
+            with open(tmp_file.name, "rb") as audio_file:
+                audio_content = audio_file.read()
+            os.unlink(tmp_file.name)
+        
+        audio_base64 = base64.b64encode(audio_content).decode()
         
         return ChatResponse(response=text_response, audio_base64=audio_base64)
     
@@ -71,33 +67,23 @@ async def chat_endpoint(request: ChatRequest):
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     
-    config = speech.RecognitionConfig(
-        encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
-        sample_rate_hertz=48000,
-        language_code="es-ES",
-    )
-    
-    streaming_config = speech.StreamingRecognitionConfig(
-        config=config,
-        interim_results=True,
-    )
-    
     try:
         while True:
             data = await websocket.receive_bytes()
             
-            # Procesar audio con Speech-to-Text
-            audio_generator = [speech.StreamingRecognizeRequest(audio_content=data)]
-            requests = (speech.StreamingRecognizeRequest(audio_content=chunk) 
-                       for chunk in audio_generator)
-            
-            responses = speech_client.streaming_recognize(streaming_config, requests)
-            
-            for response in responses:
-                for result in response.results:
-                    if result.is_final:
-                        transcript = result.alternatives[0].transcript
-                        await websocket.send_json({"transcript": transcript})
+            # Guardar audio temporalmente para Whisper
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
+                tmp_file.write(data)
+                tmp_file.flush()
+                
+                # Transcribir con Whisper
+                result = whisper_model.transcribe(tmp_file.name, language="es")
+                transcript = result["text"].strip()
+                
+                os.unlink(tmp_file.name)
+                
+                if transcript:
+                    await websocket.send_json({"transcript": transcript})
                         
     except Exception as e:
         await websocket.send_json({"error": str(e)})

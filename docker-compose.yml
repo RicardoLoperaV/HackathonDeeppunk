@@ -5,11 +5,6 @@ services:
     build: ./backend
     ports:
       - "8000:8000"
-    environment:
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
-    volumes:
-      - ${GOOGLE_APPLICATION_CREDENTIALS}:/app/credentials.json:ro
     restart: unless-stopped
 
   frontend:
