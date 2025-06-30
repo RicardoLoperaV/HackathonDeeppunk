@@ -1,6 +1,6 @@
-# 🎤 Agente Voz-a-Voz en Español
+# 🎤 Voces de Confianza: Agente Conversacional Ético para Adultos Mayores
 
-Proyecto de agente conversacional que permite interacción por voz en español, utilizando tecnologías de Google Cloud para Speech-to-Text, Gemini para procesamiento de lenguaje natural, y Text-to-Speech para respuestas habladas.
+Voces de Confianza es un agente de conversación en español diseñado para acompañar a los adultos mayores que se sienten solos. Como compañero digital, siempre está disponible para escuchar y dialogar con calidez, sin juzgar ni filtrar lo que importa. Aprovecha la potencia de Gemini y un enfoque centrado en la equidad y el respeto por la privacidad, adaptándose a su ritmo y a sus necesidades. Con este aliado, combatimos la soledad, preservamos historias valiosas y brindamos compañía genuina, gracias a un entrenamiento minucioso que garantiza respuestas empáticas y seguras.
 
 ## 🏗️ Arquitectura
 
