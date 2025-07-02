@@ -19,7 +19,7 @@ Voces de Confianza es un agente de conversación en español diseñado para acom
 
 ```bash
 # Clonar repositorio
-git clone <repository-url>
+git clone <https://github.com/RicardoLoperaV/HackathonDeeppunk>
 cd HackathonDeeppunk/frontend
 
 # Instalar dependencias
