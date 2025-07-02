@@ -191,26 +191,68 @@
                     body: audioBlob
                 });
                 
-                if (response.ok) {
-                    // 1) Leer JSON con base64
-                    const { audio_base64 } = await response.json();
-                    // 2) Decodificar base64 a bytes
-                    const binary = atob(audio_base64);
-                    const len    = binary.length;
-                    const buffer = new Uint8Array(len);
-                    for (let i = 0; i < len; i++) {
-                        buffer[i] = binary.charCodeAt(i);
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                console.log('Content-Type:', response.headers.get('content-type'));
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Verificar si la respuesta tiene contenido
+                const contentLength = response.headers.get('content-length');
+                if (contentLength === '0') {
+                    throw new Error('Respuesta vacía del servidor');
+                }
+                
+                // Verificar Content-Type antes de parsear
+                const contentType = response.headers.get('content-type');
+                
+                if (contentType && contentType.includes('application/json')) {
+                    // Es JSON - parsear normalmente
+                    const responseText = await response.text();
+                    console.log('Raw response:', responseText);
+                    
+                    if (!responseText.trim()) {
+                        throw new Error('Respuesta JSON vacía');
                     }
-                    // 3) Crear Blob de tipo MP3
-                    const mp3Blob = new Blob([buffer], { type: 'audio/mpeg' });
-                    await playAudioResponse(mp3Blob);
+                    
+                    const jsonData = JSON.parse(responseText);
+                    
+                    if (jsonData.audio_base64) {
+                        // Procesar audio base64
+                        const binary = atob(jsonData.audio_base64);
+                        const len = binary.length;
+                        const buffer = new Uint8Array(len);
+                        for (let i = 0; i < len; i++) {
+                            buffer[i] = binary.charCodeAt(i);
+                        }
+                        const mp3Blob = new Blob([buffer], { type: 'audio/mpeg' });
+                        await playAudioResponse(mp3Blob);
+                    } else {
+                        throw new Error('No se encontró audio_base64 en la respuesta');
+                    }
+                } else if (contentType && contentType.includes('audio/')) {
+                    // Es audio directo - usar como blob
+                    const audioBlob = await response.blob();
+                    await playAudioResponse(audioBlob);
                 } else {
-                    throw new Error('Error en la respuesta del webhook: ' + response.status);
+                    // Otro tipo de respuesta - mostrar como texto
+                    const responseText = await response.text();
+                    console.log('Unexpected response:', responseText);
+                    throw new Error(`Tipo de respuesta inesperado: ${contentType}`);
                 }
                 
             } catch (error) {
-                status.textContent = '❌ Error: ' + error.message;
-                console.error('Error:', error);
+                console.error('Error completo:', error);
+                
+                if (error.name === 'SyntaxError') {
+                    status.textContent = '❌ Error: Respuesta malformada del servidor';
+                } else if (error.message.includes('fetch')) {
+                    status.textContent = '❌ Error: No se pudo conectar al servidor';
+                } else {
+                    status.textContent = '❌ Error: ' + error.message;
+                }
             } finally {
                 recordBtn.disabled = false;
             }
