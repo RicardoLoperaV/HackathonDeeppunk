@@ -89,7 +89,7 @@
     </style>
 </head>
 <body>
-    <a href="index.html" class="back-btn">← Volver</a>
+    <a href="/" class="back-btn">← Volver</a>
     
     <div class="container">
         <h1>🎤 ¡Háblale a tu voz de confianza!</h1>
@@ -192,8 +192,18 @@
                 });
                 
                 if (response.ok) {
-                    const audioResponseBlob = await response.blob();
-                    await playAudioResponse(audioResponseBlob);
+                    // 1) Leer JSON con base64
+                    const { audio_base64 } = await response.json();
+                    // 2) Decodificar base64 a bytes
+                    const binary = atob(audio_base64);
+                    const len    = binary.length;
+                    const buffer = new Uint8Array(len);
+                    for (let i = 0; i < len; i++) {
+                        buffer[i] = binary.charCodeAt(i);
+                    }
+                    // 3) Crear Blob de tipo MP3
+                    const mp3Blob = new Blob([buffer], { type: 'audio/mpeg' });
+                    await playAudioResponse(mp3Blob);
                 } else {
                     throw new Error('Error en la respuesta del webhook: ' + response.status);
                 }
