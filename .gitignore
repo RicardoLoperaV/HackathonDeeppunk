@@ -217,10 +217,6 @@ yarn-error.log*
 # React build
 build/
 
-# Google Cloud credentials
-service-account-key.json
-*.json
-
 # Docker
 .dockerignore
 
