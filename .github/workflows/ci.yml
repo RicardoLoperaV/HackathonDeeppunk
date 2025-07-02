@@ -7,32 +7,6 @@ on:
     branches: [ main ]
 
 jobs:
-  backend-tests:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        cd backend
-        pip install -r requirements.txt
-        pip install pytest flake8
-    
-    - name: Lint with flake8
-      run: |
-        cd backend
-        flake8 app --count --select=E9,F63,F7,F82 --show-source --statistics
-    
-    - name: Build backend Docker image
-      run: |
-        cd backend
-        docker build -t agente-voz-backend .
-
   frontend-tests:
     runs-on: ubuntu-latest
     steps:

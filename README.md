@@ -4,31 +4,21 @@ Voces de Confianza es un agente de conversación en español diseñado para acom
 
 ## 🏗️ Arquitectura
 
-- **Backend**: FastAPI con Python
-- **Frontend**: React con Web Audio API
-- **IA**: Whisper + Hugging Face Transformers + gTTS
-- **Despliegue**: Docker + Docker Compose
+- **Frontend**: HTML/CSS/JavaScript con Web Audio API
+- **Backend**: Webhook n8n (https://totoratsu.app.n8n.cloud/webhook/viejito)
+- **Despliegue**: Docker
 
 ## 🚀 Instalación y Configuración
 
 ### Prerrequisitos
 
 1. **Software requerido**:
-   - Docker y Docker Compose
-   - Node.js 18+ (para desarrollo local)
-   - Python 3.11+ (para desarrollo local)
+   - Docker
+   - Navegador web moderno con soporte para Web Audio API
 
 ### Configuración
 
-```bash
-# Copiar archivos de ejemplo (opcional)
-cp frontend/.env.example frontend/.env
-
-# Editar frontend/.env si necesitas cambiar la URL del backend
-REACT_APP_API_URL=http://localhost:8000
-```
-
-**Nota**: Los modelos de IA se descargan automáticamente en el primer uso.
+No se requiere configuración adicional. El demo se conecta directamente al webhook de n8n.
 
 ## 🐳 Despliegue con Docker
 
@@ -41,17 +31,11 @@ docker-compose up --build
 
 **Acceso**:
 - Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- Documentación API: http://localhost:8000/docs
+- Demo: http://localhost:3000/demo.html
 
 ### Opción 2: Contenedores individuales
 
 ```bash
-# Backend
-cd backend
-docker build -t agente-voz-backend .
-docker run -p 8000:8000 agente-voz-backend
-
 # Frontend
 cd frontend
 docker build -t agente-voz-frontend .
@@ -88,31 +72,20 @@ npm install
 npm start
 ```
 
-## 📡 API Endpoints
+## 🎤 Uso del Demo
 
-### REST API
+1. Accede a http://localhost:3000/demo.html
+2. Permite el acceso al micrófono cuando se solicite
+3. Presiona el micrófono o el botón "Grabar" para comenzar
+4. Habla tu mensaje
+5. Presiona "Detener" para enviar el audio
+6. El agente procesará tu mensaje y responderá con audio
 
-- `GET /` - Health check
-- `POST /api/chat` - Enviar mensaje de texto y recibir respuesta con audio
+### Webhook Endpoint
 
-### WebSocket
-
-- `WS /api/stream` - Streaming de audio para transcripción en tiempo real
-
-### Ejemplo de uso
-
-```javascript
-// Enviar mensaje de texto
-const response = await fetch('http://localhost:8000/api/chat', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ message: 'Hola, ¿cómo estás?' })
-});
-
-const data = await response.json();
-console.log(data.response); // Respuesta en texto
-// data.audio_base64 contiene el audio en base64
-```
+- `POST https://totoratsu.app.n8n.cloud/webhook/viejito`
+- Content-Type: `audio/webm`
+- Respuesta: Audio blob (audio/mpeg o audio/webm)
 
 ## 🧪 Testing
 
@@ -131,19 +104,14 @@ npm test
 
 ```
 .
-├── backend/
-│   ├── app/
-│   │   └── main.py          # FastAPI app principal
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   └── .env.example
 ├── frontend/
+│   ├── public/
+│   │   ├── index.html       # Página principal
+│   │   └── demo.html        # Demo del agente de voz
 │   ├── src/
 │   │   ├── App.js           # Componente principal React
 │   │   ├── App.css
 │   │   └── index.js
-│   ├── public/
-│   │   └── index.html
 │   ├── Dockerfile
 │   ├── nginx.conf
 │   ├── package.json
@@ -159,11 +127,14 @@ npm test
 
 ### Errores comunes
 
-1. **Error de descarga de modelos**:
-   - Los modelos se descargan automáticamente en el primer uso
-   - Asegurar conexión a internet estable
+1. **Error de micrófono**:
+   - Asegurar que el navegador tenga permisos de micrófono
+   - Usar HTTPS en producción (requerido para Web Audio API)
 
-2. **Error de CORS en el frontend**:
+2. **Error de CORS**:
+   - El webhook de n8n debe tener CORS habilitado
+
+3. **Error de conexión al webhook**:
    - Verificar que el backend esté corriendo en el puerto correcto
    - Revisar la variable `REACT_APP_API_URL`
 
@@ -176,9 +147,6 @@ npm test
 ```bash
 # Ver logs de Docker Compose
 docker-compose logs -f
-
-# Logs específicos del backend
-docker-compose logs backend
 
 # Logs específicos del frontend
 docker-compose logs frontend
@@ -199,8 +167,8 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 ## 🔗 Enlaces Útiles
 
 - [Documentación de FastAPI](https://fastapi.tiangolo.com/)
-- [OpenAI Whisper](https://github.com/openai/whisper)
-- [Hugging Face Transformers](https://huggingface.co/transformers/)
-- [gTTS](https://github.com/pndurette/gTTS)
+- [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
+- [MediaRecorder API](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder)
+- [n8n Webhooks](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.webhook/)
 - [React Documentation](https://reactjs.org/docs/getting-started.html)
 Sistema creado para conversar de manera natural con adultos mayores. Teniendo en cuenta la época que vivieron y las cosas que eran relevantes.
