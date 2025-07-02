@@ -412,11 +412,19 @@ dificultades, además de notificar inmediatamente en caso de una emergencia.
                     <h1 class="section-title">Tecnología</h1>
                     <p class="section-subtitle">Innovación que transforma realidades</p>
                     <div class="card">
-                        
+                        <p class="section-description">
+                          Se emplea una arquitectura multiagentes basada en 
+                          <a href="https://arxiv.org/abs/2308.10848">AgentVerse</a> usando la plataforma de <a href="https://n8n.io/">n8n</a>. Un orquestador, tras procesar la entrada y su análisis de sentimientos, asigna a cada LLM (basado en ChatGPT 4.1) tanto un rol —uno como psicólogo y otro como adulto mayor de Medellín, Colombia— como una semilla para garantizar coherencia en la generación. Cada LLM participa en dos rondas de diálogo para generar la mejor respuesta al problema o pregunta planteada por el adulto mayor.
+                        </p>
 
+                        <p class="section-description">
+                          El sistema recibe como entrada un archivo de audio y devuelve otro archivo de audio con la respuesta generada. Además, si así se solicita, envía un reporte por correo electrónico con el análisis realizado al adulto mayor.
+                        </p>
+                        <img src="arquitectura.png" alt="Diagrama de arquitectura" style="width:100%; margin: 1rem 0;">
 
-
-                        
+                        <p class="section-description">
+                          En el diagrama también se incluye una base de datos de contexto, que almacena el historial de conversaciones y reportes anteriores de cada adulto mayor, permitiendo un seguimiento más completo y personalizado. Esta última parte queda para una nueva versión de la implementación.
+                        </p>
                     </div>
                 </div>
             </div>
