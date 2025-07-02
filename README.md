@@ -1,156 +1,81 @@
-# 🎤 Voces de Confianza: Agente Conversacional Ético para Adultos Mayores
+# 🎤 Voces de Compañía - Agente Voz-a-Voz
+
+## Integrantes:
+
+- **Nixon Daniel Lizcano Santana**
+- **Joan Sebastian Salazar Montoya**
+- **Ricardo Esteban Lopera Vasco**
 
 Voces de Confianza es un agente de conversación en español diseñado para acompañar a los adultos mayores que se sienten solos. Como compañero digital, siempre está disponible para escuchar y dialogar con calidez, sin juzgar ni filtrar lo que importa. Aprovecha la potencia de Gemini y un enfoque centrado en la equidad y el respeto por la privacidad, adaptándose a su ritmo y a sus necesidades. Con este aliado, combatimos la soledad, preservamos historias valiosas y brindamos compañía genuina, gracias a un entrenamiento minucioso que garantiza respuestas empáticas y seguras.
 
 ## 🏗️ Arquitectura
 
-- **Backend**: FastAPI con Python
-- **Frontend**: React con Web Audio API
-- **IA**: Whisper + Hugging Face Transformers + gTTS
-- **Despliegue**: Docker + Docker Compose
+- **Frontend**: React + HTML estático con Web Audio API
+- **Backend**: Webhook n8n (https://totoratsu.app.n8n.cloud/webhook/viejito)
+- **Demo**: Página HTML independiente para grabación y reproducción de audio
+- **Despliegue**: Docker
 
-## 🚀 Instalación y Configuración
-
-### Prerrequisitos
-
-1. **Software requerido**:
-   - Docker y Docker Compose
-   - Node.js 18+ (para desarrollo local)
-   - Python 3.11+ (para desarrollo local)
-
-### Configuración
+## 🚀 Desarrollo Local
 
 ```bash
-# Copiar archivos de ejemplo (opcional)
-cp frontend/.env.example frontend/.env
-
-# Editar frontend/.env si necesitas cambiar la URL del backend
-REACT_APP_API_URL=http://localhost:8000
-```
-
-**Nota**: Los modelos de IA se descargan automáticamente en el primer uso.
-
-## 🐳 Despliegue con Docker
-
-### Opción 1: Docker Compose (Recomendado)
-
-```bash
-# Levantar servicios
-docker-compose up --build
-```
-
-**Acceso**:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- Documentación API: http://localhost:8000/docs
-
-### Opción 2: Contenedores individuales
-
-```bash
-# Backend
-cd backend
-docker build -t agente-voz-backend .
-docker run -p 8000:8000 agente-voz-backend
-
-# Frontend
-cd frontend
-docker build -t agente-voz-frontend .
-docker run -p 3000:80 agente-voz-frontend
-```
-
-## 💻 Desarrollo Local
-
-### Backend
-
-```bash
-cd backend
-
-# Crear entorno virtual
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Instalar dependencias
-pip install -r requirements.txt
-
-# Ejecutar servidor
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### Frontend
-
-```bash
-cd frontend
+# Clonar repositorio
+git clone <https://github.com/RicardoLoperaV/HackathonDeeppunk>
+cd HackathonDeeppunk/frontend
 
 # Instalar dependencias
 npm install
 
-# Ejecutar en modo desarrollo
+# Iniciar servidor de desarrollo
 npm start
 ```
 
-## 📡 API Endpoints
+**Acceso**:
+- Página principal: http://localhost:3000
+- Demo de voz: http://localhost:3000/demo.html
 
-### REST API
-
-- `GET /` - Health check
-- `POST /api/chat` - Enviar mensaje de texto y recibir respuesta con audio
-
-### WebSocket
-
-- `WS /api/stream` - Streaming de audio para transcripción en tiempo real
-
-### Ejemplo de uso
-
-```javascript
-// Enviar mensaje de texto
-const response = await fetch('http://localhost:8000/api/chat', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ message: 'Hola, ¿cómo estás?' })
-});
-
-const data = await response.json();
-console.log(data.response); // Respuesta en texto
-// data.audio_base64 contiene el audio en base64
-```
-
-## 🧪 Testing
+## 🐳 Despliegue con Docker
 
 ```bash
-# Backend
-cd backend
-pip install pytest
-pytest
-
-# Frontend
-cd frontend
-npm test
+# Construir y ejecutar
+docker-compose up --build
 ```
+
+## 🎤 Uso del Demo
+
+1. **Acceder al demo**: Clic en botón "Demo" o navegar a `/demo.html`
+2. **Permisos**: Permitir acceso al micrófono cuando se solicite
+3. **Grabar**: Presionar el micrófono o botón "Grabar"
+4. **Hablar**: Decir tu mensaje en español
+5. **Enviar**: Presionar "Detener" para procesar
+6. **Escuchar**: El agente responderá con audio automáticamente
+
+### Integración Webhook
+
+- **Endpoint**: `https://totoratsu.app.n8n.cloud/webhook/viejito`
+- **Método**: POST con FormData
+- **Campo**: `data` (archivo audio/webm)
+- **Respuesta**: JSON con `audio_base64` o audio directo
 
 ## 🔧 Estructura del Proyecto
 
 ```
 .
-├── backend/
-│   ├── app/
-│   │   └── main.py          # FastAPI app principal
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   └── .env.example
 ├── frontend/
-│   ├── src/
-│   │   ├── App.js           # Componente principal React
-│   │   ├── App.css
-│   │   └── index.js
 │   ├── public/
-│   │   └── index.html
-│   ├── Dockerfile
-│   ├── nginx.conf
+│   │   ├── index.html       # Landing page principal
+│   │   ├── demo.html        # Demo interactivo de voz
+│   │   ├── etica_page.html  # Página de ética
+│   │   └── video1.mp4, video2.mp4, video3.mp4
+│   ├── src/
+│   │   ├── App.js           # Componente React (no usado en demo)
+│   │   ├── App.css
+│   │   ├── index.js         # Punto de entrada React
+│   │   └── setupProxy.js    # Configuración de rutas
 │   ├── package.json
-│   └── .env.example
-├── .github/
-│   └── workflows/
-│       └── ci.yml           # GitHub Actions CI/CD
+│   └── Dockerfile
+├── etica/
+│   └── etica.md            # Documentación ética
+├── .github/workflows/
 ├── docker-compose.yml
 └── README.md
 ```
@@ -159,29 +84,31 @@ npm test
 
 ### Errores comunes
 
-1. **Error de descarga de modelos**:
-   - Los modelos se descargan automáticamente en el primer uso
-   - Asegurar conexión a internet estable
-
-2. **Error de CORS en el frontend**:
-   - Verificar que el backend esté corriendo en el puerto correcto
-   - Revisar la variable `REACT_APP_API_URL`
-
-3. **Problemas con el micrófono**:
-   - Asegurar que el navegador tenga permisos de micrófono
+1. **Error de micrófono**:
+   - Permitir acceso al micrófono en el navegador
    - Usar HTTPS en producción (requerido para Web Audio API)
 
-### Logs útiles
+2. **Error "Unexpected end of JSON input"**:
+   - El webhook puede estar devolviendo respuesta vacía
+   - Verificar logs de consola para debugging
+
+3. **Error de conexión al webhook**:
+   - Verificar conectividad a internet
+   - El webhook n8n debe estar activo y configurado
+
+### Debugging
 
 ```bash
-# Ver logs de Docker Compose
+# Logs del servidor de desarrollo
+npm start
+
+# Logs de Docker
 docker-compose logs -f
 
-# Logs específicos del backend
-docker-compose logs backend
-
-# Logs específicos del frontend
-docker-compose logs frontend
+# Consola del navegador (F12)
+# - Response status y headers
+# - Contenido de respuesta del webhook
+# - Errores de audio y grabación
 ```
 
 ## 🤝 Contribución
@@ -198,9 +125,14 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 
 ## 🔗 Enlaces Útiles
 
-- [Documentación de FastAPI](https://fastapi.tiangolo.com/)
-- [OpenAI Whisper](https://github.com/openai/whisper)
-- [Hugging Face Transformers](https://huggingface.co/transformers/)
-- [gTTS](https://github.com/pndurette/gTTS)
-- [React Documentation](https://reactjs.org/docs/getting-started.html)
-Sistema creado para conversar de manera natural con adultos mayores. Teniendo en cuenta la época que vivieron y las cosas que eran relevantes.
+- [Create React App](https://create-react-app.dev/)
+- [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
+- [MediaRecorder API](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder)
+- [FormData API](https://developer.mozilla.org/en-US/docs/Web/API/FormData)
+- [n8n Webhooks](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.webhook/)
+
+## 👥 Equipo
+
+Proyecto desarrollado para el Hackathon DeepPunk - Universidad Nacional de Colombia
+
+**Misión**: Aumentar la calidad de vida de los adultos mayores a través de tecnología conversacional accesible.
