@@ -1,104 +1,54 @@
-# 🎤 Voces de Confianza: Agente Conversacional Ético para Adultos Mayores
+# 🎤 Voces de Compañía - Agente Voz-a-Voz
 
 Voces de Confianza es un agente de conversación en español diseñado para acompañar a los adultos mayores que se sienten solos. Como compañero digital, siempre está disponible para escuchar y dialogar con calidez, sin juzgar ni filtrar lo que importa. Aprovecha la potencia de Gemini y un enfoque centrado en la equidad y el respeto por la privacidad, adaptándose a su ritmo y a sus necesidades. Con este aliado, combatimos la soledad, preservamos historias valiosas y brindamos compañía genuina, gracias a un entrenamiento minucioso que garantiza respuestas empáticas y seguras.
 
 ## 🏗️ Arquitectura
 
-- **Frontend**: HTML/CSS/JavaScript con Web Audio API
+- **Frontend**: React + HTML estático con Web Audio API
 - **Backend**: Webhook n8n (https://totoratsu.app.n8n.cloud/webhook/viejito)
+- **Demo**: Página HTML independiente para grabación y reproducción de audio
 - **Despliegue**: Docker
 
-## 🚀 Instalación y Configuración
-
-### Prerrequisitos
-
-1. **Software requerido**:
-   - Docker
-   - Navegador web moderno con soporte para Web Audio API
-
-### Configuración
-
-No se requiere configuración adicional. El demo se conecta directamente al webhook de n8n.
-
-## 🐳 Despliegue con Docker
-
-### Opción 1: Docker Compose (Recomendado)
+## 🚀 Desarrollo Local
 
 ```bash
-# Levantar servicios
-docker-compose up --build
-```
-
-**Acceso**:
-- Frontend: http://localhost:3000
-- Demo: http://localhost:3000/demo.html
-
-### Opción 2: Contenedores individuales
-
-```bash
-# Frontend
-cd frontend
-docker build -t agente-voz-frontend .
-docker run -p 3000:80 agente-voz-frontend
-```
-
-## 💻 Desarrollo Local
-
-### Backend
-
-```bash
-cd backend
-
-# Crear entorno virtual
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Instalar dependencias
-pip install -r requirements.txt
-
-# Ejecutar servidor
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### Frontend
-
-```bash
-cd frontend
+# Clonar repositorio
+git clone <repository-url>
+cd HackathonDeeppunk/frontend
 
 # Instalar dependencias
 npm install
 
-# Ejecutar en modo desarrollo
+# Iniciar servidor de desarrollo
 npm start
+```
+
+**Acceso**:
+- Página principal: http://localhost:3000
+- Demo de voz: http://localhost:3000/demo.html
+
+## 🐳 Despliegue con Docker
+
+```bash
+# Construir y ejecutar
+docker-compose up --build
 ```
 
 ## 🎤 Uso del Demo
 
-1. Accede a http://localhost:3000/demo.html
-2. Permite el acceso al micrófono cuando se solicite
-3. Presiona el micrófono o el botón "Grabar" para comenzar
-4. Habla tu mensaje
-5. Presiona "Detener" para enviar el audio
-6. El agente procesará tu mensaje y responderá con audio
+1. **Acceder al demo**: Clic en botón "Demo" o navegar a `/demo.html`
+2. **Permisos**: Permitir acceso al micrófono cuando se solicite
+3. **Grabar**: Presionar el micrófono o botón "Grabar"
+4. **Hablar**: Decir tu mensaje en español
+5. **Enviar**: Presionar "Detener" para procesar
+6. **Escuchar**: El agente responderá con audio automáticamente
 
-### Webhook Endpoint
+### Integración Webhook
 
-- `POST https://totoratsu.app.n8n.cloud/webhook/viejito`
-- Content-Type: `audio/webm`
-- Respuesta: Audio blob (audio/mpeg o audio/webm)
-
-## 🧪 Testing
-
-```bash
-# Backend
-cd backend
-pip install pytest
-pytest
-
-# Frontend
-cd frontend
-npm test
-```
+- **Endpoint**: `https://totoratsu.app.n8n.cloud/webhook/viejito`
+- **Método**: POST con FormData
+- **Campo**: `data` (archivo audio/webm)
+- **Respuesta**: JSON con `audio_base64` o audio directo
 
 ## 🔧 Estructura del Proyecto
 
@@ -106,19 +56,20 @@ npm test
 .
 ├── frontend/
 │   ├── public/
-│   │   ├── index.html       # Página principal
-│   │   └── demo.html        # Demo del agente de voz
+│   │   ├── index.html       # Landing page principal
+│   │   ├── demo.html        # Demo interactivo de voz
+│   │   ├── etica_page.html  # Página de ética
+│   │   └── video1.mp4, video2.mp4, video3.mp4
 │   ├── src/
-│   │   ├── App.js           # Componente principal React
+│   │   ├── App.js           # Componente React (no usado en demo)
 │   │   ├── App.css
-│   │   └── index.js
-│   ├── Dockerfile
-│   ├── nginx.conf
+│   │   ├── index.js         # Punto de entrada React
+│   │   └── setupProxy.js    # Configuración de rutas
 │   ├── package.json
-│   └── .env.example
-├── .github/
-│   └── workflows/
-│       └── ci.yml           # GitHub Actions CI/CD
+│   └── Dockerfile
+├── etica/
+│   └── etica.md            # Documentación ética
+├── .github/workflows/
 ├── docker-compose.yml
 └── README.md
 ```
@@ -128,28 +79,30 @@ npm test
 ### Errores comunes
 
 1. **Error de micrófono**:
-   - Asegurar que el navegador tenga permisos de micrófono
+   - Permitir acceso al micrófono en el navegador
    - Usar HTTPS en producción (requerido para Web Audio API)
 
-2. **Error de CORS**:
-   - El webhook de n8n debe tener CORS habilitado
+2. **Error "Unexpected end of JSON input"**:
+   - El webhook puede estar devolviendo respuesta vacía
+   - Verificar logs de consola para debugging
 
 3. **Error de conexión al webhook**:
-   - Verificar que el backend esté corriendo en el puerto correcto
-   - Revisar la variable `REACT_APP_API_URL`
+   - Verificar conectividad a internet
+   - El webhook n8n debe estar activo y configurado
 
-3. **Problemas con el micrófono**:
-   - Asegurar que el navegador tenga permisos de micrófono
-   - Usar HTTPS en producción (requerido para Web Audio API)
-
-### Logs útiles
+### Debugging
 
 ```bash
-# Ver logs de Docker Compose
+# Logs del servidor de desarrollo
+npm start
+
+# Logs de Docker
 docker-compose logs -f
 
-# Logs específicos del frontend
-docker-compose logs frontend
+# Consola del navegador (F12)
+# - Response status y headers
+# - Contenido de respuesta del webhook
+# - Errores de audio y grabación
 ```
 
 ## 🤝 Contribución
@@ -166,9 +119,14 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 
 ## 🔗 Enlaces Útiles
 
-- [Documentación de FastAPI](https://fastapi.tiangolo.com/)
+- [Create React App](https://create-react-app.dev/)
 - [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
 - [MediaRecorder API](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder)
+- [FormData API](https://developer.mozilla.org/en-US/docs/Web/API/FormData)
 - [n8n Webhooks](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.webhook/)
-- [React Documentation](https://reactjs.org/docs/getting-started.html)
-Sistema creado para conversar de manera natural con adultos mayores. Teniendo en cuenta la época que vivieron y las cosas que eran relevantes.
+
+## 👥 Equipo
+
+Proyecto desarrollado para el Hackathon DeepPunk - Universidad Nacional de Colombia
+
+**Misión**: Aumentar la calidad de vida de los adultos mayores a través de tecnología conversacional accesible.
