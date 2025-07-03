@@ -12,6 +12,10 @@ El proyecto contiene una página web en el directorio frontend/public/index.html
 
 ## 🏗️ Arquitectura
 
+![](./frontend/public/arquitectura.png)
+
+Modelo multiagente basado en la arquitectura [AgentVerse](https://arxiv.org/abs/2308.10848), para mas detalles ver el [video de explicación de la arquitectura](https://youtu.be/GKVmPTkT7PA).
+
 - **Frontend**: React + HTML estático con Web Audio API
 - **Backend**: Webhook n8n (https://totoratsu.app.n8n.cloud/webhook/viejito)
 - **Demo**: Página HTML independiente para grabación y reproducción de audio
