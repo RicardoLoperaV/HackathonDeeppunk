@@ -8,7 +8,7 @@
 
 Nuestra misión es aumentar la calidad de vida de los adultos mayores. Para esto, desarrollaremos un agente conversacional, que hable con ellos, tenga memoria de conversaciones pasadas, y pueda crear momentos amenos con los adultos mayores. 
 
-El proyecto contiene una página web en el directorio frontend/public/index.html. *Para acceder a la página web, se debe ejecutar el archivo index en local, y acceder a la página web*. 
+El proyecto contiene una página web en el directorio frontend/public/index.html. *Para acceder a la página web, se debe ejecutar el archivo index en local, y acceder a la página web, si solo se quiere leer la descripcion del proyecto se puede ver en el [siguiente enlace](http://100.24.18.136/)*. 
 
 ## 🏗️ Arquitectura
 
