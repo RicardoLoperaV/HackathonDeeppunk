@@ -8,7 +8,7 @@
 
 Nuestra misión es aumentar la calidad de vida de los adultos mayores. Para esto, desarrollaremos un agente conversacional, que hable con ellos, tenga memoria de conversaciones pasadas, y pueda crear momentos amenos con los adultos mayores. 
 
-Los sistemas de inteligencia artificial están avanzando rápidamente en sus capacidades. En particular, la posibilidad de hablar en lenguaje natural con una IA abre un vasto abanico de posibilidades para mejorar la calidad de vida de las personas. Queremos desarrollar un agente conversacional, diseñado especificamente para adultos mayores. Algo parecido a Alexa, pero radicalmente distinto en sus capacidades. Alexa es simplemente un sistema que ejecuta ciertos comandos muy específicos, una suerte de panel de control para la casa controlado por voz. Lo que nosotros proponemos es un cuidador artificial para el adulto mayor, con el cual se pueda conversar naturalmente y crear un vínculo, el cual cuente con memoría de conversaciones pasadas y la capacidad de asistir al adulto mayor en sus dificultades, además de notificar inmediatamente en caso de una emergencia.
+El proyecto contiene una página web en el directorio frontend/public/index.html. *Para acceder a la página web, se debe ejecutar el archivo index en local, y acceder a la página web*. 
 
 ## 🏗️ Arquitectura
 
